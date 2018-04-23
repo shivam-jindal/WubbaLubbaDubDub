@@ -1,0 +1,10 @@
+listen morty
+x squanch 1
+y squanch 2
+foo squanch 9
+if x is the same as y then
+foo squanch 0
+otherwise
+foo squanch 1
+wubalubadubdub
+show me what you got foo

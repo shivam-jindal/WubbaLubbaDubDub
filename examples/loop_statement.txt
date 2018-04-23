@@ -1,11 +1,8 @@
 listen morty
-a squanch True
-b squanch 3
-c squanch 5
-
-While True 
-do this for grandpa
-b squanch b plus 1
+x squanch 1
+y squanch 2
+foo squanch 2
+while x is the same as y do this for grandpa
+foo squanch 3
 thanks Summer
-
-show me what you got c
+show me what you got foo
