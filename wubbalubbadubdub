@@ -1,5 +1,3 @@
-runhaskell Lexer.hs < $1 | python hsToC.py > a.out.c
-if [ $? -eq 0 ]; then
-    gcc a.out.c -lm
-fi
-
+#!/bin/bash
+runhaskell Parser.hs < $1 | python hsToC.py > 'outputs/a.cpp'
+g++ a.cpp -lm -o outputs/a.out

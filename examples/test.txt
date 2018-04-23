@@ -1,0 +1,7 @@
+universe one
+numOne squanch 1
+numTwo squanch 2
+numThree squanch 3
+numRes squanch numOne plus numTwo times numThree
+show me what you got numRes
+destroy universe

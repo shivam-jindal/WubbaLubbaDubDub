@@ -1,0 +1,6 @@
+listen morty
+numOne squanch 1
+numTwo squanch 2
+numThree squanch 3
+numRes squanch numOne plus numTwo minus numThree
+show me what you got numRes

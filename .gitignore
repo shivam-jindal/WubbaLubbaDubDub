@@ -1,0 +1,4 @@
+# Generated intermediate files #
+*.out
+# Generated cpp files #
+*.cpp
