@@ -1,40 +1,33 @@
 module FuncDef where
-
-import Control.Monad 
-import Text.Parsec hiding (crlf)
-import Text.Parsec.String
-import Control.Applicative ((<*))
 import VarDef
 import Debug.Trace
+import Control.Monad 
+import Text.Parsec.String
+import Control.Applicative ((<*))
+import Text.Parsec hiding (crlf)
 
-parenA = do
-  whitespace
-  void $ string "you gotta"
-  whitespace
-  e <- op3
-  whitespace
-  void $ string "Morty"
-  whitespace
-  return (EParens e)
 
---Parses boolean operation within parentheses
-parenB = do
-  whitespace
-  void $ string "you gotta"
-  whitespace
-  e <- op1
-  whitespace
-  void $ string "Morty"
-  whitespace
-  return (EParens e)
+--GRAMMAR--
 
---Clears whitespace
+--multi -> [univ]
+--univ -> [stmt]
+--stmt ->  decl  | print | if | while
+--if -> 'if' opb 'then' [stmt] 'otherwise' [stmt]
+
+--expr -> op1
+
+--op1  -> op2 and op1 | op2 or op1  | op2
+--op2  -> op3 == op2  | op3 < op2   | op3 > op2  | op3
+--op3  -> op4 + op3   | op4 - op3   | op4
+--op4  -> pterm * op4 | pterm / op4 | pterm mod op4 | pterm
+--pterm -> base | parenA | parenB | pvar
+--base -> pint | bRight | bWrong
+
+
 whitespace = void $ many $ oneOf" \t\n"
-
---Clears newlines
 crlf = many $ oneOf "\n"
 
---Parses multiplication
+--Parsing for arithmetic operations
 pmul = do
   whitespace
   e1 <- pterm
@@ -45,7 +38,6 @@ pmul = do
   whitespace
   return $ EBin Mul e1 e2
 
---Parses division
 pdiv = do
   whitespace
   e1 <- pterm
@@ -56,7 +48,6 @@ pdiv = do
   whitespace
   return $ EBin Div e1 e2
 
---Parses modulo
 pmod = do
   whitespace
   e1 <- pterm
@@ -67,7 +58,6 @@ pmod = do
   whitespace
   return $ EBin Mod e1 e2
 
---Parses addition
 padd = do
   whitespace
   e1 <- op4
@@ -78,7 +68,6 @@ padd = do
   whitespace
   return $ EBin Add e1 e2
 
---Parses subtraction
 psub = do
   whitespace
   e1 <- op4
@@ -89,9 +78,6 @@ psub = do
   whitespace
   return $ EBin Sub e1 e2
 
---BOOLEAN OPERATOR PARSER--
-
---Parses and
 band = do
   whitespace
   e1 <- op2
@@ -102,7 +88,6 @@ band = do
   whitespace
   return $ EBin And e1 e2
 
---Parses or
 bor = do
   whitespace
   e1 <- op2
@@ -113,7 +98,6 @@ bor = do
   whitespace
   return $ EBin Or e1 e2
 
---Parses numeric equality
 numEq = do
   whitespace
   e1 <- op3
@@ -123,7 +107,6 @@ numEq = do
   whitespace
   return $ EBin Equals e1 e2
 
---Parses numeric less than
 numLt = do
   whitespace
   e1 <- op3
@@ -133,7 +116,6 @@ numLt = do
   whitespace
   return $ EBin LessThan e1 e2
 
---Parses numeric greater than
 numGt = do
   whitespace
   e1 <- op3
@@ -143,9 +125,30 @@ numGt = do
   whitespace
   return $ EBin LessThan e1 e2
 
---STATEMENTS--
 
---Parses if statements
+--Parsing parent statements
+parenA = do
+  whitespace
+  void $ string "you gotta"
+  whitespace
+  e <- op3
+  whitespace
+  void $ string "Morty"
+  whitespace
+  return (EParens e)
+
+parenB = do
+  whitespace
+  void $ string "you gotta"
+  whitespace
+  e <- op1
+  whitespace
+  void $ string "Morty"
+  whitespace
+  return (EParens e)
+
+
+--Parsing statements
 sIf = do
   whitespace
   string "if"
@@ -164,7 +167,6 @@ sIf = do
   whitespace
   return $ SIf e1 s1 s2
 
---Parses variable declaration
 sDec = do
   whitespace
   s <- many1 letter
@@ -175,7 +177,6 @@ sDec = do
   whitespace
   return $ SDecl s e
 
---Parses print statements
 sPrint = do
   whitespace
   string "show me what you got"
@@ -184,7 +185,6 @@ sPrint = do
   whitespace
   return $ SPrint s
 
---Parses while statements
 sWhile = do
   whitespace
   string "while"
@@ -199,7 +199,6 @@ sWhile = do
   whitespace
   return $ SWhile e s
 
---Parses portal statements for multithreaded jumps
 sPortal = do
   whitespace
   string "lets grab our"
@@ -210,10 +209,6 @@ sPortal = do
   whitespace
   return $ SPortal u
 
-
---UNIVERSE--
-
---Parses a single universe (ie. a list of statements between a universe declaration and "destroy universe"
 uParse = do
   whitespace
   string "listen"
@@ -224,27 +219,10 @@ uParse = do
   whitespace
   return $ (s, b)
 
---GRAMMAR--
-
---multi -> [univ]
---univ -> [stmt]
---stmt -> if | while | dec | portal | print
---if -> 'if' opb 'then' [stmt] 'otherwise' [stmt]
-
---expr -> op1
-
---op1  -> op2 and op1 | op2 or op1  | op2
---op2  -> op3 == op2  | op3 < op2   | op3 > op2  | op3
---op3  -> op4 + op3   | op4 - op3   | op4
---op4  -> pterm * op4 | pterm / op4 | pterm mod op4 | pterm
---pterm -> base | parenA | parenB | pvar
---base -> pint | bRight | bWrong
 
 stmt = try sPortal <|> try sIf <|> try sDec <|> try sPrint <|> try sWhile
 
 expr = try op1
-
---NUMBER OPS--
 
 op1 = try band <|> try bor <|> op2
 op2 = try numEq <|> try numLt <|> try numGt <|> op3
@@ -260,8 +238,6 @@ pint = do
   whitespace
   return $ EIntLit (read n)
 
---BOOL OPS--
-
 bRight :: Parser Exp
 bRight = do
   whitespace
@@ -275,8 +251,6 @@ bWrong = do
   string "wrong"
   whitespace
   return $ EBoolLit False
-
---VARS--
 
 pvar :: Parser Exp
 pvar = do

@@ -1,0 +1,11 @@
+listen morty
+a squanch True
+b squanch 3
+c squanch 5
+
+While True 
+do this for grandpa
+b squanch b plus 1
+thanks Summer
+
+show me what you got c
